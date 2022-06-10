@@ -87,9 +87,8 @@ spin &
 SPIN_ID=$!
 disown
 
-cd ./../nmap
 nmap -n -sn $NetMask -oG - | awk '/Up$/{print $2}' > Liste_Adresse.txt #Récupération des adresses sur le réseau pour le lancement en parallèle de la récup de ressources
-mv Liste_Adresse.txt ./../../Temps
+mv Liste_Adresse.txt $RepPC/Temp_Expinfo_CyLR/Temps
 
 kill -9 $SPIN_ID > /dev/null
 printf '[\342\234\224] Fait.\n' | iconv -f UTF-8
@@ -115,10 +114,6 @@ SPIN_ID=$!
 disown
 
 sshpass -p $SuPasswd parallel-ssh -h Liste_Adresse.txt -A -l root 'apt-get -qq -y install git; mkdir /Temp_Expinfo_CyLR; cd /Temp_Expinfo_CyLR; git clone https://github.com/Th3Fall3nAng3l/Forseti_pssh; cd Forseti_pssh;chmod 755 ./Forseti_pssh.sh ;./Forseti_pssh.sh'
-while IFS='' read -r line; do
-  ssh $line
-  echo "réussi"
-done < Liste_Adresse.txt
 
 cd ./../CyLR
 ./CyLR -q -of "$NOW"_"$HOSTNAME"_CyLR.zip >/dev/null #Lancement de l'outil CyLR
