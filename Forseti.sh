@@ -54,9 +54,10 @@ mkdir $RepPC/Temp_Expinfo_CyLR/Temps
 
 cd $RepPC/Temp_Expinfo_CyLR/Tools
 apt-get -qq -y install git
+apt-get -qq -y install sshpass
 apt-get -qq -y install pssh
 apt-get -qq -y install curl
-git clone -q https://github.com/nmap/nmap
+apt-get -qq -y install nmap
 mkdir ./CyLR
 cd ./CyLR
 wget -q https://github.com/orlikoski/CyLR/releases/download/2.2.0/CyLR_linux-x64.zip
@@ -113,7 +114,11 @@ spin &
 SPIN_ID=$!
 disown
 
-parallele-ssh -A $SuPasswd -h Liste_Adresse.txt -l root "apt-get -qq -y install git; mkdir $RepPC/Temp_Expinfo_CyLR; cd $RepPC/Temp_Expinfo_CyLR; git clone https://github.com/Th3Fall3nAng3l/Forseti_pssh; cd Forseti_pssh; ./Forseti_pssh.sh"
+sshpass -p $SuPasswd parallel-ssh -h Liste_Adresse.txt -A -l root 'apt-get -qq -y install git; mkdir /Temp_Expinfo_CyLR; cd /Temp_Expinfo_CyLR; git clone https://github.com/Th3Fall3nAng3l/Forseti_pssh; cd Forseti_pssh;chmod 755 ./Forseti_pssh.sh ;./Forseti_pssh.sh'
+while IFS='' read -r line; do
+  ssh $line
+  echo "réussi"
+done < Liste_Adresse.txt
 
 cd ./../CyLR
 ./CyLR -q -of "$NOW"_"$HOSTNAME"_CyLR.zip >/dev/null #Lancement de l'outil CyLR
