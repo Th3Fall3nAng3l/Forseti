@@ -131,9 +131,11 @@ SPIN_ID=$!
 disown
 
 cd $RepPC/Temp_Expinfo_CyLR/Temps
-while IFS= read -r line; do
-    sshpass -p $SuPasswd ssh -f $line apt-get -qq -y install git; mkdir /Temp_Expinfo_CyLR; cd /Temp_Expinfo_CyLR; git clone https://github.com/Th3Fall3nAng3l/Forseti_pssh; cd Forseti_pssh;chmod 755 ./Forseti_pssh.sh ;./Forseti_pssh.sh
-done < $RepPC/Temp_Expinfo_CyLR/Temps/Liste_Adresse.txt
+cat Liste_Adresse.txt | while read line;
+do
+    sshpass -p $SuPasswd ssh -o "StrictHostKeyChecking=no" -n $line apt-get -qq -y install git; mkdir /Temp_Expinfo_CyLR; cd /Temp_Expinfo_CyLR; git clone https://github.com/Th3Fall3nAng3l/Forseti_pssh; cd Forseti_pssh;chmod 755 ./Forseti_pssh.sh ;./Forseti_pssh.sh
+done
+
 #sshpass -p $SuPasswd parallel-ssh -h Liste_Adresse.txt -A -l $SuUsername 'apt-get -qq -y install git; mkdir /Temp_Expinfo_CyLR; cd /Temp_Expinfo_CyLR; git clone https://github.com/Th3Fall3nAng3l/Forseti_pssh; cd Forseti_pssh;chmod 755 ./Forseti_pssh.sh ;./Forseti_pssh.sh'
 
 cd $RepPC/Temp_Expinfo_CyLR/Tools/CyLR
