@@ -133,15 +133,13 @@ disown
 cd $RepPC/Temp_Expinfo_CyLR/Temps
 cat Liste_Adresse.txt | while read line;
 do
-    sshpass -p $SuPasswd ssh -o "StrictHostKeyChecking=no" -n $line apt-get -qq -y install git; mkdir /Temp_Expinfo_CyLR; cd /Temp_Expinfo_CyLR; git clone https://github.com/Th3Fall3nAng3l/Forseti_pssh; cd Forseti_pssh;chmod 755 ./Forseti_pssh.sh ;./Forseti_pssh.sh
+  sshpass -p $SuPasswd ssh -o "StrictHostKeyChecking=no" -n $line "apt-get -y install curl; apt-get -y install unzip; mkdir /Temp_Expinfo; cd /Temp_Expinfo; curl -s --ftp-ssl --insecure ftp://$Server:$ServerPort/FTP_EXPINFO/Forseti_DFIR/Ressources/Forseti_pssh.sh -u $User:$Passwd --output Forseti_pssh.sh; chmod 755 Forseti_pssh.sh; ./Forseti_pssh.sh"
 done
 
-#sshpass -p $SuPasswd parallel-ssh -h Liste_Adresse.txt -A -l $SuUsername 'apt-get -qq -y install git; mkdir /Temp_Expinfo_CyLR; cd /Temp_Expinfo_CyLR; git clone https://github.com/Th3Fall3nAng3l/Forseti_pssh; cd Forseti_pssh;chmod 755 ./Forseti_pssh.sh ;./Forseti_pssh.sh'
-
-cd $RepPC/Temp_Expinfo_CyLR/Tools/CyLR
-./CyLR -q -of "$HOSTNAME"_CyLR.zip >/dev/null #Lancement de l'outil CyLR
-curl -s --ftp-ssl --insecure -T "$HOSTNAME"_CyLR.zip ftp://$Server:$ServerPort/$ServerRep/ --user $User:$Passwd #Transfert du fichier .zip obtenu sur le serveur ftp avec un protocole ssl
-printf '[\342\234\224] Fait.\n' | iconv -f UTF-8
+#cd $RepPC/Temp_Expinfo_CyLR/Tools/CyLR
+#./CyLR -q -of "$HOSTNAME"_CyLR.zip >/dev/null #Lancement de l'outil CyLR
+#curl -s --ftp-ssl --insecure -T "$HOSTNAME"_CyLR.zip ftp://$Server:$ServerPort/$ServerRep/ --user $User:$Passwd #Transfert du fichier .zip obtenu sur le serveur ftp avec un protocole ssl
+#printf '[\342\234\224] Fait.\n' | iconv -f UTF-8
 
 kill -9 $SPIN_ID > /dev/null
 
