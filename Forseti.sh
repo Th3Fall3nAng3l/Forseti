@@ -62,7 +62,7 @@ disown
 #~~~~~Mise en place des dossiers temporaires~~~~~
 
 mkdir $RepPC/Temp_Expinfo
-chmod 777 /Temp_Expinfo
+chmod 777 $RepPC/Temp_Expinfo
 
 #~~~~~Installation des outils~~~~~
 
@@ -76,7 +76,7 @@ apt-get -qq -y install unzip
 curl --ftp-ssl --insecure ftp://$Server:$ServerPort/FTP_EXPINFO/investigations/tools/CyLR_linux-x64.zip -u $User:$Passwd --output CyLR_linux-x64.zip
 unzip CyLR_linux-x64.zip > /dev/null
 rm -rf CyLR_linux-x64.zip
-chmod 777 CyLR
+chmod 777 $RepPC/Temp_Expinfo/CyLR
 
 kill -9 $SPIN_ID > /dev/null
 printf '[\342\234\224] Fait.\n' | iconv -f UTF-8
@@ -132,8 +132,9 @@ cd $RepPC/Temp_Expinfo
 cat Liste_Adresse.txt | while read line;
 do
   ((i=i+1))
-  sshpass -p $SuPasswd ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -n $line "echo $SuPasswd | sudo -S mkdir ~/Temp_Expinfo"
-  sshpass -p $SuPasswd scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p $RepPC/Temp_Expinfo/CyLR $line:~/Temp_Expinfo
+  sshpass -p $SuPasswd ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -n $line "mkdir ~/Temp_Expinfo"
+  cd $RepPC/Temp_Expinfo
+  sshpass -p $SuPasswd scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p ./CyLR $line:~/Temp_Expinfo
   sshpass -p $SuPasswd ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -n $line "cd ~/Temp_Expinfo; echo $SuPasswd | sudo -S ./CyLR -q -of Host_"$i"_CyLR.zip"
   sshpass -p $SuPasswd scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p $line:~/Temp_Expinfo/Host_"$i"_CyLR.zip $RepPC/Temp_Expinfo
   curl --ftp-ssl --insecure -T Host_"$i"_CyLR.zip ftp://$Server:$ServerPort/$ServerRep/ --user $User:$Passwd
