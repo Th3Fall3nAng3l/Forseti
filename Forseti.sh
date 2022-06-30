@@ -131,12 +131,12 @@ cd $RepPC/Temp_Expinfo
 cat Liste_Adresse.txt | while read line;
 do
   ((i=i+1))
-  sshpass -p $SuPasswd ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -n $line "mkdir /Temp_Expinfo"
+  sshpass -p $SuPasswd ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -n $line "echo $Supasswd | sudo -S mkdir /Temp_Expinfo"
   sshpass -p $SuPasswd scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p $RepPC/Temp_Expinfo/CyLR $line:/Temp_Expinfo
-  sshpass -p $SuPasswd ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -n $line "cd /Temp_Expinfo; echo $SuPasswd | sudo -S ./CyLR -q -of Host_"$i"_CyLR.zip"
+  sshpass -p $SuPasswd ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -n $line "echo $Supasswd | sudo -S cd /Temp_Expinfo; echo $SuPasswd | sudo -S ./CyLR -q -of Host_"$i"_CyLR.zip"
   sshpass -p $SuPasswd scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p $line:/Temp_Expinfo/Host_"$i"_CyLR.zip $RepPC/Temp_Expinfo
   curl -s --ftp-ssl --insecure -T Host_"$i"_CyLR.zip ftp://$Server:$ServerPort/$ServerRep/ --user $User:$Passwd
-  sshpass -p $SuPasswd ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -n $line "rm -rf /Temp_Expinfo"
+  sshpass -p $SuPasswd ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -n $line "echo $Supasswd | sudo -S rm -rf /Temp_Expinfo"
 done
 
 printf '[\342\234\224] Fait.\n' | iconv -f UTF-8
