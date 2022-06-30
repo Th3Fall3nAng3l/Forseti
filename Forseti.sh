@@ -149,7 +149,7 @@ kill -9 $SPIN_ID > /dev/null
 echo -e "\nSupression des dossiers temporaires..."
 
 cd $RepPC
-#rm -rf ./Temp_Expinfo
+rm -rf ./Temp_Expinfo
 
 printf '[\342\234\224] Fait.\n' | iconv -f UTF-8
 
