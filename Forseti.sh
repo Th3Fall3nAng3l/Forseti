@@ -61,20 +61,17 @@ disown
 
 #~~~~~Mise en place des dossiers temporaires~~~~~
 
-mkdir $RepPC/Temp_Expinfo_CyLR
-mkdir $RepPC/Temp_Expinfo_CyLR
-mkdir $RepPC/Temp_Expinfo_CyLR
+mkdir $RepPC/Temp_Expinfo
 
 #~~~~~Installation des outils~~~~~
 
-cd $RepPC/Temp_Expinfo_CyLR
+cd $RepPC/Temp_Expinfo
+
 apt-get -qq -y install sshpass
 apt-get -qq -y install curl
 apt-get -qq -y install nmap
 apt-get -qq -y install unzip
-apt-get -qq -y install scp
-mkdir $RepPC/Temp_Expinfo_CyLR/CyLR
-cd $RepPC/Temp_Expinfo_CyLR/CyLR
+
 curl -s --ftp-ssl --insecure ftp://$Server:$ServerPort/FTP_EXPINFO/investigations/tools/CyLR_linux-x64.zip -u $User:$Passwd --output CyLR_linux-x64.zip
 unzip CyLR_linux-x64.zip > /dev/null
 rm -rf CyLR_linux-x64.zip
@@ -103,8 +100,8 @@ SPIN_ID=$!
 disown
 
 nmap -p22 --open $NetMask -oG - | awk '/Up$/{print $2}' > Liste_Adresse.txt #Récupération des adresses sur le réseau pour le lancement en parallèle de la récup de ressources
-mv Liste_Adresse.txt $RepPC/Temp_Expinfo_CyLR
-cd $RepPC/Temp_Expinfo_CyLR
+mv Liste_Adresse.txt $RepPC/Temp_Expinfo
+cd $RepPC/Temp_Expinfo
 sed -i 's/^/'$SuUsername'@/' Liste_Adresse.txt
 
 kill -9 $SPIN_ID > /dev/null
@@ -130,11 +127,16 @@ spin &
 SPIN_ID=$!
 disown
 
-cd $RepPC/Temp_Expinfo_CyLR
+cd $RepPC/Temp_Expinfo
 cat Liste_Adresse.txt | while read line;
 do
-  #sshpass -p $SuPasswd ssh -o "StrictHostKeyChecking=no" -n $line ""
-  echo $line
+  ((i=i+1))
+  sshpass -p $SuPasswd ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -n $line "mkdir /Temp_Expinfo"
+  sshpass -p $SuPasswd scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p $RepPC/Temp_Expinfo/CyLR $line:/Temp_Expinfo
+  sshpass -p $SuPasswd ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -n $line "cd /Temp_Expinfo; echo $SuPasswd | sudo -S ./CyLR -q -of Host_"$i"_CyLR.zip"
+  sshpass -p $SuPasswd scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p $line:/Temp_Expinfo/Host_"$i"_CyLR.zip $RepPC/Temp_Expinfo
+  curl -s --ftp-ssl --insecure -T Host_"$i"_CyLR.zip ftp://$Server:$ServerPort/$ServerRep/ --user $User:$Passwd
+  sshpass -p $SuPasswd ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -n $line "rm -rf /Temp_Expinfo"
 done
 
 printf '[\342\234\224] Fait.\n' | iconv -f UTF-8
@@ -145,7 +147,7 @@ kill -9 $SPIN_ID > /dev/null
 echo -e "\nSupression des dossiers temporaires..."
 
 cd $RepPC
-#rm -rf ./Temp_Expinfo_CyLR
+#rm -rf ./Temp_Expinfo
 
 printf '[\342\234\224] Fait.\n' | iconv -f UTF-8
 
