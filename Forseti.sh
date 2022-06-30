@@ -68,16 +68,15 @@ mkdir $RepPC/Temp_Expinfo_CyLR/Temps
 #~~~~~Installation des outils~~~~~
 
 cd $RepPC/Temp_Expinfo_CyLR/Tools
-apt-get -qq -y install git
 apt-get -qq -y install sshpass
-apt-get -qq -y install pssh
 apt-get -qq -y install curl
 apt-get -qq -y install nmap
+apt-get -qq -y install unzip
 mkdir $RepPC/Temp_Expinfo_CyLR/Tools/CyLR
 cd $RepPC/Temp_Expinfo_CyLR/Tools/CyLR
-curl -s --ftp-ssl --insecure ftp://$Server:$ServerPort/FTP_EXPINFO/CyLR/CyLRLinux.zip -u $User:$Passwd --output CyLRLinux.zip
-unzip CyLRLinux.zip > /dev/null
-rm -rf CyLRLinux.zip
+curl -s --ftp-ssl --insecure ftp://$Server:$ServerPort/FTP_EXPINFO/investigations/tools/CyLR_linux-x64.zip -u $User:$Passwd --output CyLR_linux-x64.zip
+unzip CyLR_linux-x64.zip > /dev/null
+rm -rf CyLR_linux-x64.zip
 
 kill -9 $SPIN_ID > /dev/null
 printf '[\342\234\224] Fait.\n' | iconv -f UTF-8
@@ -102,7 +101,7 @@ spin &
 SPIN_ID=$!
 disown
 
-nmap -n -sn $NetMask -oG - | awk '/Up$/{print $2}' > Liste_Adresse.txt #Récupération des adresses sur le réseau pour le lancement en parallèle de la récup de ressources
+nmap -p22 --open $NetMask -oG - | awk '/Up$/{print $2}' > Liste_Adresse.txt #Récupération des adresses sur le réseau pour le lancement en parallèle de la récup de ressources
 mv Liste_Adresse.txt $RepPC/Temp_Expinfo_CyLR/Temps
 cd $RepPC/Temp_Expinfo_CyLR/Temps
 sed -i 's/^/'$SuUsername'@/' Liste_Adresse.txt
@@ -133,14 +132,10 @@ disown
 cd $RepPC/Temp_Expinfo_CyLR/Temps
 cat Liste_Adresse.txt | while read line;
 do
-  sshpass -p $SuPasswd ssh -o "StrictHostKeyChecking=no" -n $line "apt-get -y install curl; apt-get -y install unzip; mkdir /Temp_Expinfo; cd /Temp_Expinfo; curl -s --ftp-ssl --insecure ftp://$Server:$ServerPort/FTP_EXPINFO/Forseti_DFIR/Ressources/Forseti_pssh.sh -u $User:$Passwd --output Forseti_pssh.sh; chmod 755 Forseti_pssh.sh; ./Forseti_pssh.sh"
+  sshpass -p $SuPasswd ssh -o "StrictHostKeyChecking=no" -n $line "apt-get -y install curl; apt-get -y install unzip; curl -s --ftp-ssl --insecure ftp://$Server:$ServerPort/FTP_EXPINFO/investigations/tools/Forseti_Client.sh -u $User:$Passwd --output Forseti_Client.sh; chmod 755 Forseti_Client.sh; ./Forseti_Client.sh"
 done
 
-#cd $RepPC/Temp_Expinfo_CyLR/Tools/CyLR
-#./CyLR -q -of "$HOSTNAME"_CyLR.zip >/dev/null #Lancement de l'outil CyLR
-#curl -s --ftp-ssl --insecure -T "$HOSTNAME"_CyLR.zip ftp://$Server:$ServerPort/$ServerRep/ --user $User:$Passwd #Transfert du fichier .zip obtenu sur le serveur ftp avec un protocole ssl
-#printf '[\342\234\224] Fait.\n' | iconv -f UTF-8
-
+printf '[\342\234\224] Fait.\n' | iconv -f UTF-8
 kill -9 $SPIN_ID > /dev/null
 
 #~~~~~Supression des dossiers temporaires~~~~~
