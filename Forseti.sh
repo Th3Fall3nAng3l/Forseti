@@ -79,7 +79,7 @@ rm -rf CyLR_linux-x64.zip
 #chmod 777 $RepPC/Temp_Expinfo/CyLR
 
 kill -9 $SPIN_ID > /dev/null
-printf '[\342\234\224] Fait.\n' | iconv -f UTF-8
+printf '\n[\342\234\224] Fait.\n' | iconv -f UTF-8
 
 #~~~~~Initialisation de Nmap pour créer une liste d'adresse ip connectées~~~~~
 
@@ -106,7 +106,7 @@ cd $RepPC/Temp_Expinfo
 sed -i 's/^/'$SuUsername'@/' Liste_Adresse.txt
 
 kill -9 $SPIN_ID > /dev/null
-printf '[\342\234\224] Fait.\n' | iconv -f UTF-8
+printf '\n[\342\234\224] Fait.\n' | iconv -f UTF-8
 
 #~~~~~Lancement en parallele de la récupération de ressources~~~~~
 
@@ -141,7 +141,7 @@ do
   sshpass -p $SuPasswd ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -n $line "echo $SuPasswd | sudo -S rm -rf ~/Temp_Expinfo"
 done
 
-printf '[\342\234\224] Fait.\n' | iconv -f UTF-8
+printf '\n[\342\234\224] Fait.\n' | iconv -f UTF-8
 kill -9 $SPIN_ID > /dev/null
 
 #~~~~~Supression des dossiers temporaires~~~~~
@@ -151,8 +151,10 @@ echo -e "\nSupression des dossiers temporaires..."
 cd $RepPC
 rm -rf ./Temp_Expinfo
 
-printf '[\342\234\224] Fait.\n' | iconv -f UTF-8
+printf '\n[\342\234\224] Fait.\n' | iconv -f UTF-8
 
 #~~~~~Fin~~~~~
 
 printf "\n[\342\234\224] ${RED}Récupération terminée.\n" | iconv -f UTF-8
+printf "\n[\342\234\224] ${RED}Transfert terminé.\n" | iconv -f UTF-8
+printf "\n[\342\234\224] ${RED}Suppression des fichiers temporaires terminée.\n" | iconv -f UTF-8
