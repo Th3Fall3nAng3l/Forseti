@@ -29,6 +29,7 @@ SuPasswd="JeSuis1Mot2Passe"
 #~~~~~Variables statiques~~~~~
 
 RepPC=$PWD
+Date=date +"%d/%m/%Y"
 
 #~~~~~Initialisation~~~~~
 
@@ -135,8 +136,8 @@ do
   sshpass -p $SuPasswd ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -n $line "mkdir ~/Temp_Expinfo"
   cd $RepPC/Temp_Expinfo
   sshpass -p $SuPasswd scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p ./CyLR $line:~/Temp_Expinfo
-  sshpass -p $SuPasswd ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -n $line "cd ~/Temp_Expinfo; echo $SuPasswd | sudo -S ./CyLR -of Host_"$i"_CyLR.zip"
-  sshpass -p $SuPasswd scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p $line:~/Temp_Expinfo/Host_"$i"_CyLR.zip $RepPC/Temp_Expinfo
+  sshpass -p $SuPasswd ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -n $line "cd ~/Temp_Expinfo; echo $SuPasswd | sudo -S ./CyLR -of Host_"$i"_"$Date"_CyLR.zip"
+  sshpass -p $SuPasswd scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p $line:~/Temp_Expinfo/Host_"$i"_"$Date"_CyLR.zip $RepPC/Temp_Expinfo
   curl --ftp-ssl --insecure -T Host_"$i"_CyLR.zip ftp://$Server:$ServerPort/$ServerRep/ --user $User:$Passwd
   sshpass -p $SuPasswd ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -n $line "echo $SuPasswd | sudo -S rm -rf ~/Temp_Expinfo"
 done
